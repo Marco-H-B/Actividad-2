@@ -180,7 +180,7 @@ Esto estresa:
 Las pruebas verifican **comportamiento observable** en instancias pequeñas.  
 La **complejidad y correctitud** requieren demostración matemática:
 
-**Ejemplo**: 
+**Ejemplo**:
 
 - Una prueba pública que inserta n=100 y elimina 50 puede pasar en ambas estruturas: ArrayStack y una con realloc ingenuo.
 - Pero con n=1M, el realloc ingenuo colapsaría O(n²).
@@ -244,6 +244,7 @@ Resolviendo: $b = \frac{-1 + \sqrt{1 + 8i}}{2}$, redondeado al entero superior (
 ### 4. Información que produce `locate(i)` en versión explicada
 
 `locate(i)` en `RootishArrayStackExplicado.h` retorna un par `{b, j}`:
+
 - **b**: número de bloque (0, 1, 2, ...)
 - **j**: offset dentro del bloque (0 a b)
 
@@ -299,18 +300,18 @@ Esto es ejemplar de **abstracción**: cambiar la representación sin cambiar el 
 
 ### 7. Qué parte es más difícil de defender oralmente
 
-**Más difícil: el mapeo (i2b)**
+#### Más difícil: el mapeo (i2b)
 
 - Requiere derivar/entender la fórmula cuadrática
 - Verbalizar cómo se invierte r(r+1)/2 = i en tiempo real es rápido pero no trivial
 - Preguntas como "¿qué pasa con i = 100 en 5 bloques?" exigen cálculo rápido
 
-**Moderado: análisis espacial**
+#### Moderado: análisis espacial
 
 - Sumar 1+2+3+...+r es fácil (es r(r+1)/2)
 - Pero defender por qué esto implica O(√n) bloques requiere entender que r² ≈ 2n
 
-**Más fácil: amortización de grow/shrink**
+#### Más fácil: amortización de grow/shrink
 
 - Similar a ArrayStack: agregar/quitar bloques es add/remove en la estructura `blocks`
 - El análisis es análogo: grow = O(1) amortizado porque se hace cada O(√n) operaciones
