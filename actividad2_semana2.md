@@ -1,10 +1,9 @@
-## Actividad 2-CC232
+# Actividad 2-CC232
 
-### Integrantes
-- (Nombre 1 - Integrante 1)
+## Integrantes
+
+- Marco Antonio Huamani Bonifacio - 20232741D
 - (Nombre 2 - Integrante 2)
-
----
 
 ## Bloque 1: Núcleo conceptual de la semana
 
