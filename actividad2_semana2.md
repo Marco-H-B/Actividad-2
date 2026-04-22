@@ -14,6 +14,7 @@ Un arreglo usa **memoria contigua** cuando todos sus elementos se guardan en blo
 ### 2. Acceso en O(1)
 
 Acceder a `A[i]` es O(1) porque la memoria contigua permite **direccionamiento directo**. Dado que:
+
 - El arreglo comienza en una dirección base `base`
 - Cada elemento ocupa exactamente `sizeof(T)` bytes
 - La dirección del elemento `i` es: `base + i * sizeof(T)`
@@ -30,6 +31,7 @@ En `ArrayStack.h`, `n` es el size y `a.length` es la capacidad. Por ejemplo, si 
 ### 4. Por qué un arreglo dinámico no puede crecer "en sitio"
 
 Un arreglo no puede crecer simplemente añadiendo más bytes adyacentes porque:
+
 - La memoria después del bloque actual puede estar **ya asignada a otro objeto**.
 - No hay garantía de que exista espacio contiguo adicional.
 - Cambiar la dirección base del arreglo invalidaría todos los punteros externos.
@@ -39,6 +41,7 @@ Por eso, `resize()` en `ArrayStack` crea un **nuevo bloque más grande**, copia 
 ### 5. Amortización con duplicación
 
 Cuando duplicamos la capacidad en cada resize:
+
 - Insertar n elementos requiere resizes en posiciones 1, 2, 4, 8, ... (potencias de 2).
 - El costo total es: 1 + 2 + 4 + ... + n = O(2n - 1) = O(n).
 - Amortizado: O(n)/n = O(1) por inserción.
@@ -48,7 +51,7 @@ Si creciera linealmente (capacity += c), los resizes sumarían n/c términos de 
 ### 6. Comparación ArrayStack vs DengVector
 
 | Aspecto | ArrayStack | DengVector |
-|---------|-----------|-----------|
+| ------- | ---------- | ---------- |
 | **Interfaz** | `add(int i, T x)`, `remove(int i)`, `get(i)`, `set(i,x)` | `insert(int r, const T& e)`, `remove(int r)`, `operator[]`, `find(e)`, `traverse(visit)` |
 | **Crecimiento** | `capacity = max(2*n, 1)` | `capacity = 2*capacity` |
 | **Decrecimiento** | Si `length >= 3*n`: resize a `2*n` | Si `size*4 < capacity` y `capacity > 2*DEFAULT`: divide capacity por 2 |
