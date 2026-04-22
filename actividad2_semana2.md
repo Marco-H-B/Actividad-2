@@ -1,7 +1,8 @@
 # Actividad 2-CC232
 
-### Integrantes
-- (Nombre 1 - Integrante 1)
+## Integrantes
+
+- Marco Antonio Huamani Bonifacio - 20232741D
 - Cabello Quevedo Yaimar Alexis - 20244712D
 
 ## Bloque 1: Núcleo conceptual de la semana
