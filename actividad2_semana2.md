@@ -9,30 +9,30 @@
 
 ### 1. Memoria contigua en un arreglo
 
-Un arreglo usa memoria contigua si sus elementos se guardan en bloques consecutivos de la RAM. En lugar de dispersar los elementos en direcciones aleatorias, el arreglo reserva un bloque único y continuo donde cada elemento ocupa exactamente `sizeof(T)` bytes. Esto se ve en `array.h` donde `T *a` apunta al comienzo del bloque, y cada posición `i` está en `a + i * sizeof(T)`. Esto es la diferencia principal entre arrays y estructuras como listas enlazadas que fragmentan memoria.
+Un arreglo usa memoria contigua si sus elementos se guardan en bloques consecutivos de la RAM. En lugar de dispersar los elementos en direcciones aleatorias, el arreglo reserva un bloque único y continuo donde cada elemento ocupa exactamente `sizeof(T)` bytes. Esto se ve en `array.h` donde `T * a` apunta al comienzo del bloque, y cada posición `i` está en `a + i * sizeof(T)`. Esto es la diferencia principal entre arrays y estructuras como listas enlazadas que fragmentan memoria.
 
 ### 2. Acceso en O(1)
 
-Acceder a `A[i]` es O(1) porque la memoria contigua permite **direccionamiento directo**. Dado que:
+Acceder a `A[i]` es O(1) porque la memoria contigua permite **direccionamiento directo**:
 
-- El arreglo comienza en una dirección base `base`
-- Cada elemento ocupa exactamente `sizeof(T)` bytes
+- El arreglo comienza en una dirección `base`
+- Cada elemento ocupa `sizeof(T)` bytes
 - La dirección del elemento `i` es: `base + i * sizeof(T)`
 
 El procesador calcula esta dirección mediante una única operación aritmética, sin necesidad de iterar o buscar. No importa si accedemos a `A[0]` o `A[999]`: el costo temporal es el mismo (una lectura de memoria).
 
 ### 3. Diferencia entre `size` y `capacity`
 
-- **`size` (n)**: número actual de elementos almacenados en la estructura. Refleja cuántos datos válidos contiene.
-- **`capacity`**: número total de celdas reservadas en memoria. Es el máximo de elementos que caben sin necesidad de realocación.
+- **`size` (n)**: Es el número actual de elementos almacenados en la estructura y refleja cuántos datos válidos contiene.
+- **`capacity`**: Es el número total de celdas reservadas en memoria. Es el máximo de elementos que caben sin necesidad de realocación.
 
-En `ArrayStack.h`, `n` es el size y `a.length` es la capacidad. Por ejemplo, si hemos insertado 5 elementos pero reservamos espacio para 10, `size=5` pero `capacity=10`. La diferencia permite alocar más memoria de la inmediatamente necesaria, amortizando el costo de realloc.
+En `ArrayStack.h`, `n` es el size y `a.length` es la capacidad. Por ejemplo, si hemos insertado 5 elementos (`size=5`) pero reservamos espacio para 10 (`capacity=10`). La diferencia permite alocar más memoria de la inmediatamente necesaria, amortizando el costo de realloc.
 
 ### 4. Por qué un arreglo dinámico no puede crecer "en sitio"
 
 Un arreglo no puede crecer simplemente añadiendo más bytes adyacentes porque:
 
-- La memoria después del bloque actual puede estar **ya asignada a otro objeto**.
+- La memoria después del bloque actual puede estar **asignada a otro objeto**.
 - No hay garantía de que exista espacio contiguo adicional.
 - Cambiar la dirección base del arreglo invalidaría todos los punteros externos.
 
@@ -102,7 +102,6 @@ RootishArrayStack reduce el desperdicio sacrificando un poco de simplicidad en l
 ## Bloque 2: Demostración y trazado guiado
 
 | Archivo | Salida/observable | Idea estructural | Costo/espacio (resumen) |
-
 | ------- | ----------------- | ---------------- | ----------------------- |
 | `include/ArrayStack.h` | add/get/remove, `size` | Arreglo dinámico contiguo | `resize()` O(n) ocasional; O(1) amortizado; desperdicio posible O(n) |
 | `include/FastArrayStack.h` | Igual funcionalidad, mejor tiempo práctico | Mismo diseño; usa `std::copy` para mover datos | Constantes mejores; misma complejidad asintótica |
@@ -115,7 +114,7 @@ RootishArrayStack reduce el desperdicio sacrificando un poco de simplicidad en l
 
 Se nos muestra que un arreglo ocupa un bloque contiguo de memoria y que la "longitud" lógica (cuántos elementos usamos) puede diferir de la capacidad reservada; también deja claro que el acceso por índice es directo.
 
-### 2. Operación optima para costo por desplazamiento
+### 2. Operación óptima para costo por desplazamiento
 
 Evidencia operaciones como `add(0,x)` o `remove(0)` que desplazan todos los elementos: son las que muestran mejor el costo O(n) por desplazamiento.
 
@@ -123,7 +122,7 @@ Evidencia operaciones como `add(0,x)` o `remove(0)` que desplazan todos los elem
 
 Demuestra el mismo comportamiento funcional que `ArrayStack` pero con `std::copy`/`std::copy_backward` para mover datos, mejorando tiempos prácticos sin cambiar la complejidad asintótica.
 
-### 4. Ejemplo optimo para el mapeo de índice lógico a bloque y offset
+### 4. Ejemplo óptimo para el mapeo de índice lógico a bloque y offset
 
 Usa índices concretos (p. ej. `i=5`) para mostrar `i2b` y `locate(i)`, y cómo eso se traduce en `blocks[b][j]` en la ubicación física.
 
@@ -135,7 +134,7 @@ Imprime `size` y `capacity` tras inserciones, permitiendo ver cuándo se ejecuta
 
 Muestra que `std::vector` y `DengVector` comparten la semántica `size`/`capacity` y el crecimiento amortizado sobre memoria contigua, confirmando la idea de `DengVector` como vector didáctico.
 
-### 7. Demo optimo para amortizacion y uso de espacio
+### 7. Demo óptimo para amortización y uso de espacio
 
 Para defender amortización conviene `demo_deng_vector.cpp` (o `demo_arraystack.cpp`) porque muestra la evolución de `capacity`; para defender ahorro de espacio conviene `demo_rootisharraystack_explicado.cpp`, que visualiza bloques y desperdicio reducido.
 
@@ -450,7 +449,7 @@ Cada operación mantiene esto:
 | ------- | ---------- | -------------- | ----------------- |
 | **Representación** | array[0..n-1] contiguo | array[0..n-1] contiguo (mismo que ArrayStack) | bloques[0..r-1], bloque b de tamaño b+1 |
 | **Correctitud invariante** | n ≤ length, datos en [0..n-1] | Idéntico a ArrayStack | n ≤ r(r+1)/2, mapeo i→(b,j) siempre válido |
-| **Costo amortizado add/remove** | O(1) al final, O(n-i) en posición i; amortización por duplicación | O(1) al final, O(n-i) en posición i; mais fast copy | O(1) al final; O(n-i) promedio en posición i |
+| **Costo amortizado add/remove** | O(1) al final, O(n-i) en posición i; amortización por duplicación | O(1) al final, O(n-i) en posición i; FastArrayStack logra el mismo costo asintótico pero con copia más rápida | O(1) al final; O(n-i) promedio en posición i |
 | **Desperdicio espacial** | O(n) en peor caso | O(n) igual | O(√n) promedio |
 
 El cambio fundamental: **desacoplamos representación física de interfaz lógica**, permitiendo optimizaciones sin cambiar cómo el usuario ve la estructura.
