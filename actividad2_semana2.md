@@ -9,7 +9,7 @@
 
 ### 1. Memoria contigua en un arreglo
 
-Un arreglo usa **memoria contigua** cuando todos sus elementos se guardan en bloques consecutivos de memoria RAM. En lugar de dispersar los elementos en direcciones aleatorias, el arreglo reserva un bloque único y continuo donde cada elemento ocupa exactamente `sizeof(T)` bytes. Esto es visible en `array.h` donde `T *a` apunta al inicio del bloque, y cada posición `i` se encuentra en `a + i * sizeof(T)`. Esta disposición es la diferencia fundamental entre arrays y estructuras como listas enlazadas que fragmentan memoria.
+Un arreglo usa memoria contigua si sus elementos se guardan en bloques consecutivos de la RAM. En lugar de dispersar los elementos en direcciones aleatorias, el arreglo reserva un bloque único y continuo donde cada elemento ocupa exactamente `sizeof(T)` bytes. Esto se ve en `array.h` donde `T *a` apunta al comienzo del bloque, y cada posición `i` está en `a + i * sizeof(T)`. Esto es la diferencia principal entre arrays y estructuras como listas enlazadas que fragmentan memoria.
 
 ### 2. Acceso en O(1)
 
