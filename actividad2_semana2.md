@@ -1,9 +1,8 @@
 # Actividad 2-CC232
 
-## Integrantes
-
-- Marco Antonio Huamani Bonifacio - 20232741D
-- (Nombre 2 - Integrante 2)
+### Integrantes
+- (Nombre 1 - Integrante 1)
+- Cabello Quevedo Yaimar Alexis - 20244712D
 
 ## Bloque 1: Núcleo conceptual de la semana
 
@@ -99,7 +98,37 @@ La fórmula `i2b(i) = ceil((-3 + sqrt(9 + 8*i))/2)` invierte la relación r(r+1)
 
 RootishArrayStack reduce el desperdicio sacrificando un poco de simplicidad en la búsqueda de bloque. Pero conserva la interfaz de lista: acceso, inserción y remoción siguen siendo los mismos métodos lógicos.
 
----
+## Bloque 2: Demostración y trazado guiado
+
+| Archivo | Salida/observable | Idea estructural | Costo/espacio (resumen) |
+|---|---:|---|---|
+| `include/ArrayStack.h` | add/get/remove, `size` | Arreglo dinámico contiguo | `resize()` O(n) ocasional; O(1) amortizado; desperdicio posible O(n) |
+| `include/FastArrayStack.h` | Igual funcionalidad, mejor tiempo práctico | Mismo diseño; usa `std::copy` para mover datos | Constantes mejores; misma complejidad asintótica |
+| `include/RootishArrayStack.h` | get/set/add/remove; mapeo índice→bloque | Bloques 1,2,3,... en `blocks` | Acceso O(1); desperdicio ~O(√n), menos que ArrayStack |
+| `include/DengVector.h` | `size`/`capacity`, copia profunda | Vector semántico (copia/assign) | Crece por duplicación → O(1) amortizado; manejo de copia explícito |
+| `pruebas_publicas/test_public_week2.cpp` | Smoke tests (funcionalidad) | Valida interfaz pública | No mide complejidad; verifica corretitud básica |
+| `pruebas_internas/resize_stress_week2.cpp` | Stress de `resize`/`shrink` | Inserciones/borrados masivos | Expone amortización y estabilidad bajo carga |
+
+### 1. Arreglo, longitud y asignación
+Se nos muestra que un arreglo ocupa un bloque contiguo de memoria y que la "longitud" lógica (cuántos elementos usamos) puede diferir de la capacidad reservada; también deja claro que el acceso por índice es directo.
+
+### 2. Operación optima para costo por desplazamiento
+Evidencia operaciones como `add(0,x)` o `remove(0)` que desplazan todos los elementos: son las que muestran mejor el costo O(n) por desplazamiento.
+
+### 3. Cambios en la implementación
+Demuestra el mismo comportamiento funcional que `ArrayStack` pero con `std::copy`/`std::copy_backward` para mover datos, mejorando tiempos prácticos sin cambiar la complejidad asintótica.
+
+### 4. Ejemplo optimo para el mapeo de índice lógico a bloque y offset
+Usa índices concretos (p. ej. `i=5`) para mostrar `i2b` y `locate(i)`, y cómo eso se traduce en `blocks[b][j]` en la ubicación física.
+
+### 5. Crecimiento de capacity
+Imprime `size` y `capacity` tras inserciones, permitiendo ver cuándo se ejecuta `expand()` y justificar el crecimiento por duplicación observando los saltos en `capacity`.
+
+### 6. Similitud conceptual con DengVector
+Muestra que `std::vector` y `DengVector` comparten la semántica `size`/`capacity` y el crecimiento amortizado sobre memoria contigua, confirmando la idea de `DengVector` como vector didáctico.
+
+### 7. Demo optimo para amortizacion y uso de espacio
+Para defender amortización conviene `demo_deng_vector.cpp` (o `demo_arraystack.cpp`) porque muestra la evolución de `capacity`; para defender ahorro de espacio conviene `demo_rootisharraystack_explicado.cpp`, que visualiza bloques y desperdicio reducido.
 
 ## Bloque 3: Pruebas públicas, stress y correctitud
 
@@ -192,7 +221,28 @@ Además:
 - Las pruebas **no prueban causalidad**: por qué funciona, qué garantías mantiene
 - Un test puede pasar por suerte, pero un invariante probado es verdad siempre
 
----
+## Bloque 4: Vector como puente entre teoría y código
+
+### 1. Función de `_size`, `_capacity` y `_elem`
+`_size` cuenta los elementos válidos; `_capacity` indica cuánto espacio está reservado; `_elem` es el buffer donde se almacenan los datos. Esta separación permite gestionar la memoria sin cambiar la vista lógica.
+
+### 2. Cuándo ejecutar `expand()`
+Se llama justo antes de insertar cuando `size == capacity`. Normalmente duplica la capacidad y copia los datos al nuevo buffer para mantener amortización en inserciones.
+
+### 3. Por qué `insert(r, e)` desplaza elementos
+Para dejar libre la posición `r` hay que mover los elementos desde `r` hasta `size-1` una posición a la derecha; ese movimiento preserva el orden y cuesta O(size−r).
+
+### 4. Diferencia entre `remove(r)` y `remove(lo, hi)`
+`remove(r)` quita un solo elemento y desplaza el resto; `remove(lo,hi)` elimina un rango completo y desplaza la cola una sola vez, lo que suele ser más eficiente si se borra contiguamente.
+
+### 5. Evidencia de copia profunda
+El constructor copia y el `operator=` asignan un nuevo buffer y copian los elementos; en la práctica se demuestra modificando la fuente y comprobando que la copia permanece intacta.
+
+### 6. Por qué `traverse()` es útil
+Permite aplicar una operación a cada elemento sin exponer la representación interna, es claro para demos y facilita verificar/comprobar comportamiento uniforme.
+
+### 7. Ventajas de implementar un vector propio
+Ayuda a entender gestión de memoria, políticas de crecimiento, semántica de copia y amortización; además permite adaptar comportamiento para experimentos o claridad didáctica.
 
 ## Bloque 5: RootishArrayStack - espacio y mapeo
 
@@ -316,6 +366,23 @@ Esto es ejemplar de **abstracción**: cambiar la representación sin cambiar el 
 - Similar a ArrayStack: agregar/quitar bloques es add/remove en la estructura `blocks`
 - El análisis es análogo: grow = O(1) amortizado porque se hace cada O(√n) operaciones
 
+<<<<<<< HEAD
+## Bloque 6:
+
+### 1. ¿Qué aporta `operator[]` a la idea de vector?
+Ofrece acceso posicional directo y familiar (`v[i]`) que oculta la gestión del buffer; implica acceso O(1) y hace que el vector se use como un arreglo dinámico pero seguro.
+
+### 2. ¿Qué supone `find(e)` sobre igualdad entre elementos?
+Supone una relación de igualdad definida (por ejemplo `operator==`) y, en la implementación típica, realiza una búsqueda lineal hasta encontrar `e`, por lo que su costo es O(n) en el peor caso; la semántica de igualdad del tipo influye en su comportamiento.
+
+### 3. ¿Qué muestra `traverse()` sobre procesamiento uniforme de toda la estructura?
+Demuestra cómo aplicar la misma operación a cada elemento sin exponer la representación; es ideal para inspección, pruebas o aplicar efectos y tiene costo O(n) proporcional al número de elementos.
+
+### 4. ¿Por qué esta lectura refuerza `DengVector`?
+La lectura aclara conceptos clave (size vs capacity, políticas de crecimiento, semántica de copia) que se ven en `DengVector`, por lo que complementa las demos y facilita explicar invariantes y costos de forma más segura.
+
+=======
+>>>>>>> baa96f8c0f3e35939960fc89b40f811b55d0b1f2
 ## Bloque 7: Representación y correctitud
 
 ### Representación
